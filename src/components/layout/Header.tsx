@@ -8,6 +8,11 @@ import {
   SunIcon,
   Bars3Icon,
   XMarkIcon,
+  PaintBrushIcon,
+  EyeIcon,
+  ShoppingCartIcon,
+  CogIcon,
+  ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '../../store/useStore';
 import { useTheme } from '../../hooks/useTheme';
@@ -16,17 +21,24 @@ import { Card } from '../ui/Card';
 
 export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, isAuthenticated, cart, setSidebarOpen } = useStore();
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const { user, isAuthenticated, cart, setSidebarOpen, logout } = useStore();
   const { theme, toggleTheme } = useTheme();
 
   const navigation = [
     { name: 'Design Studio', href: '/design' },
     { name: 'Gallery', href: '/gallery' },
     { name: 'Products', href: '/products' },
-    { name: 'Pricing', href: '/pricing' },
+    { name: 'My Designs', href: '/my-designs' },
+    { name: 'My Orders', href: '/orders' },
   ];
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleLogout = () => {
+    logout();
+    setUserDropdownOpen(false);
+  };
 
   return (
     <motion.header
@@ -100,10 +112,43 @@ export const Header: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   className="flex items-center space-x-2"
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 >
                   <UserCircleIcon className="h-5 w-5" />
                   <span className="hidden sm:inline">{user?.name}</span>
                 </Button>
+
+                {userDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                  >
+                    <Link
+                      to="/my-designs"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      <PaintBrushIcon className="h-4 w-4 mr-3" />
+                      My Designs
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserDropdownOpen(false)}
+                    >
+                      <ShoppingCartIcon className="h-4 w-4 mr-3" />
+                      My Orders
+                    </Link>
+                    <button
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={handleLogout}
+                    >
+                      <ArrowRightOnRectangleIcon className="h-4 w-4 mr-3" />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-2">

@@ -9,6 +9,7 @@ import {
   DevicePhoneMobileIcon,
   ComputerDesktopIcon,
   SparklesIcon,
+  RobotIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -17,12 +18,15 @@ import { Modal } from '../ui/Modal';
 import { useStore } from '../../store/useStore';
 import { AIDesignGenerator } from './AIDesignGenerator';
 import { ProductViewer } from './ProductViewer';
+import { AIOrderConfirmation } from './AIOrderConfirmation';
 
 export const DesignStudio: React.FC = () => {
   const [selectedTool, setSelectedTool] = useState<'select' | 'text' | 'image' | 'shape'>('select');
   const [showAIModal, setShowAIModal] = useState(false);
+  const [showAIConfirmation, setShowAIConfirmation] = useState(false);
   const [currentView, setCurrentView] = useState<'front' | 'back' | 'left' | 'right'>('front');
   const [previewMode, setPreviewMode] = useState<'2d' | '3d'>('2d');
+  const [currentOrderId, setCurrentOrderId] = useState<string>('');
   const stageRef = useRef<any>(null);
 
   const { currentDesign, setCurrentDesign } = useStore();
@@ -54,6 +58,19 @@ export const DesignStudio: React.FC = () => {
   const handleSaveDesign = () => {
     // Save current design
     console.log('Saving design');
+    alert('Design saved successfully!');
+  };
+
+  const handleConfirmOrderWithAI = () => {
+    // Generate a random order ID for demo
+    const orderId = 'ORD_' + Math.floor(Math.random() * 10000);
+    setCurrentOrderId(orderId);
+    setShowAIConfirmation(true);
+  };
+
+  const handleAIOrderConfirmation = (orderId: string) => {
+    console.log(`Order ${orderId} confirmed via AI`);
+    alert(`Order ${orderId} has been confirmed and saved!`);
   };
 
   return (
@@ -93,8 +110,18 @@ export const DesignStudio: React.FC = () => {
                 fullWidth
                 leftIcon={<SparklesIcon className="h-4 w-4" />}
                 onClick={() => setShowAIModal(true)}
+                className="mb-3"
               >
                 Generate Design
+              </Button>
+              <Button
+                variant="success"
+                size="sm"
+                fullWidth
+                leftIcon={<RobotIcon className="h-4 w-4" />}
+                onClick={handleConfirmOrderWithAI}
+              >
+                Confirm Order with AI
               </Button>
             </Card>
 
@@ -265,6 +292,13 @@ export const DesignStudio: React.FC = () => {
       >
         <AIDesignGenerator onClose={() => setShowAIModal(false)} />
       </Modal>
+
+      <AIOrderConfirmation
+        isOpen={showAIConfirmation}
+        onClose={() => setShowAIConfirmation(false)}
+        orderId={currentOrderId}
+        onConfirm={handleAIOrderConfirmation}
+      />
     </div>
   );
 };
